@@ -1,3 +1,9 @@
+htop (3.0.5-7deepin1) unstable; urgency=medium
+
+  * Non-maintainer upload.
+
+ -- lichenggang <lichenggang@uniontech.com>  Thu, 24 Nov 2022 11:47:07 +0800
+
 htop (3.0.5-7) unstable; urgency=medium
 
   * Fix division by 0 on ZfsCompressedArcMeter (when no ZFS volume is mounted)
