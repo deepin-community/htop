@@ -1,7 +1,7 @@
 /*
 htop - Compat.c
 (C) 2020 htop dev team
-Released under the GNU GPLv2, see the COPYING file
+Released under the GNU GPLv2+, see the COPYING file
 in the source distribution for its full text.
 */
 
@@ -11,16 +11,17 @@ in the source distribution for its full text.
 
 #include <errno.h>
 #include <fcntl.h> // IWYU pragma: keep
-#include <time.h>
+#include <limits.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h> // IWYU pragma: keep
 
 #include "XUtils.h" // IWYU pragma: keep
 
-#ifdef HAVE_HOST_GET_CLOCK_SERVICE
-#include <mach/clock.h>
-#include <mach/mach.h>
+
+/* GNU/Hurd does not have PATH_MAX in limits.h */
+#ifndef PATH_MAX
+# define PATH_MAX 4096
 #endif
 
 
@@ -43,14 +44,14 @@ int Compat_faccessat(int dirfd,
 #endif
 
    // Error out on unsupported configurations
-   if (dirfd != AT_FDCWD || mode != F_OK) {
+   if (dirfd != (int)AT_FDCWD || mode != F_OK) {
       errno = EINVAL;
       return -1;
    }
 
    // Fallback to stat(2)/lstat(2) depending on flags
    struct stat statinfo;
-   if(flags) {
+   if (flags) {
       ret = lstat(pathname, &statinfo);
    } else {
       ret = stat(pathname, &statinfo);
@@ -124,30 +125,32 @@ ssize_t Compat_readlinkat(int dirfd,
 #endif
 }
 
-int Compat_clock_monotonic_gettime(struct timespec *tp) {
+ssize_t Compat_readlink(openat_arg_t dirfd,
+                        const char* pathname,
+                        char* buf,
+                        size_t bufsize) {
 
-#if defined(HAVE_CLOCK_GETTIME)
+#ifdef HAVE_OPENAT
 
-   return clock_gettime(CLOCK_MONOTONIC, tp);
+   char fdPath[32];
+   xSnprintf(fdPath, sizeof(fdPath), "/proc/self/fd/%d", dirfd);
 
-#elif defined(HAVE_HOST_GET_CLOCK_SERVICE)
+   char dirPath[PATH_MAX + 1];
+   ssize_t r = readlink(fdPath, dirPath, sizeof(dirPath) - 1);
+   if (r < 0)
+      return r;
 
-   clock_serv_t cclock;
-   mach_timespec_t mts;
+   dirPath[r] = '\0';
 
-   host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
-   clock_get_time(cclock, &mts);
-   mach_port_deallocate(mach_task_self(), cclock);
-
-   tp->tv_sec = mts.tv_sec;
-   tp->tv_nsec = mts.tv_nsec;
-
-   return 0;
+   char linkPath[PATH_MAX + 1];
+   xSnprintf(linkPath, sizeof(linkPath), "%s/%s", dirPath, pathname);
 
 #else
 
-#error No Compat_clock_monotonic_gettime() implementation!
+   char linkPath[PATH_MAX + 1];
+   xSnprintf(linkPath, sizeof(linkPath), "%s/%s", dirfd, pathname);
 
-#endif
+#endif /* HAVE_OPENAT */
 
+   return readlink(linkPath, buf, bufsize);
 }

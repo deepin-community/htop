@@ -1,14 +1,93 @@
-htop (3.0.5.1-7deepin1) unstable; urgency=medium
+htop (3.2.2-2) unstable; urgency=medium
 
-  * Non-maintainer upload.
+  * Remove LXC special handling for CPUs
 
- -- lichenggang <lichenggang@uniontech.com>  Thu, 24 Nov 2022 11:47:07 +0800
+ -- Daniel Lange <DLange@debian.org>  Sun, 26 Feb 2023 12:50:00 +0100
+
+htop (3.2.2-1) unstable; urgency=medium
+
+  * Import upstream 3.2.2 release
+  * CPUMeter now can show frequency in text mode
+  * Add option to render distribution path prefixes shadowed
+  * DiskIOMeter converts to bytes per second (not per interval)
+  * DiskIOMeter uses complete units, including missing "iB/s"
+  * DiskIOMeter indicates read and write in meter mode
+  * NetworkIOMeter converts to packets per second, shows packet rate
+  * Allow continued process following when changing display settings
+  * Update the panel header when changing to another tab
+  * Drop margin around the header if there are no meters
+  * Use Unicode replacement character for non-printable characters
+  * Default color preset uses bold blue for better visibility
+  * Update the Panel header on sort order inversions ('I')
+  * Toggle the header meters with pound key
+  * Fix ScreenPanel to handle quitting the panel while renaming
+  * Add fallback for HOME environment variable using passwd database
+  * Replace meaningless ID column with FD column in lock screen
+  * Use device format in the lock screen matching the files screen
+  * On Linux, improvements to file-descriptor lock detection
+  * On Linux, further distinguish systemd states in the SystemdMeter
+  * On Linux, improvements to cgroup and container identification
+  * On Linux, support openat(2) without readlinkat(2) platforms
+  * Handle invalid process columns from the configuration file
+  * Avoid undefined behaviour with deeply nested processes
+  * Fix crash when removing the currently active screen
+  * Prevent possible crash on a very early error path
+  * Include automake for Debian/Ubuntu
+  * Restore non-mouse support
+  * Reject unsupported command line arguments
+  * Document idle process state
+  * Clarify M_TRS/M_DRS columns
+
+ -- Daniel Lange <DLange@debian.org>  Sun, 05 Feb 2023 03:59:59 +0100
+
+htop (3.2.1-1) unstable; urgency=medium
+
+  * Import upstream 3.2.1 release
+  * Update policy to 4.6.1 (no changes required)
+  * Fix setting to show all branches collapsed by default
+  * Restore functionality of stripExeFromCmdline setting
+  * Fix some command line display settings not being honored without restart
+    (Closes: #1010780)
+  * Display single digit precision for CPU% greater than 99.9%
+  * Consider only shrinkable ZFS ARC as cache
+  * Increase field width of CPUD% and SWAPD% columns
+  * Colorize process state characters in help screen
+  * Use mousemask(3X) to enable and disable mouse control
+  * Fix heap buffer overflow in Vector_compact
+  * Resolve processes exiting interfering with sampling
+  * Fix ProcessList quadratic removal when scanning processes
+  * Under LXC, limit CPU count to that given by /proc/cpuinfo
+  * Improve container detection for LXC
+  * Some minor documentation fixes
+
+ -- Daniel Lange <DLange@debian.org>  Fri, 03 Jun 2022 09:00:00 +0200
+
+htop (3.2.0-1) unstable; urgency=medium
+
+  * Import upstream 3.2.0 release
+    (Closes: #1004582)
+  * Drop Debian patches applied upstream
+  * This version now has Screen tabs in the user interface
+    (use the tab key to switch)
+  * Allow multiple filter and search terms (logical OR, separate by "|")
+  * Add heuristics for guessing LXC or Docker from /proc/1/mounts
+    (this fixes a bug with memory reporting in containers while using ZFS
+    on the host)
+  * Many more performance and small functionality improvements
+
+ -- Daniel Lange <DLange@debian.org>  Mon, 02 May 2022 16:27:00 +0200
+
+htop (3.1.0-1) UNRELEASED; urgency=medium
+
+  * Import upstream 3.1.0 release
+  * Drop all Debian patches (have been applied upstream or superseded)
+
+ -- Daniel Lange <DLange@debian.org>  Tue, 21 Sep 2021 08:55:00 +0200
 
 htop (3.0.5-7) unstable; urgency=medium
 
   * Fix division by 0 on ZfsCompressedArcMeter (when no ZFS volume is mounted)
   * Update watch file to match Github URL schema change
-
 
  -- Daniel Lange <DLange@debian.org>  Sun, 02 May 2021 13:00:00 +0200
 

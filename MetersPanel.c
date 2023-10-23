@@ -1,7 +1,7 @@
 /*
 htop - MetersPanel.c
 (C) 2004-2011 Hisham H. Muhammad
-Released under the GNU GPLv2, see the COPYING file
+Released under the GNU GPLv2+, see the COPYING file
 in the source distribution for its full text.
 */
 
@@ -33,7 +33,7 @@ static const char* const MetersMovingKeys[] = {"Space", "Enter", "Up", "Dn", "<-
 static const int MetersMovingEvents[] = {' ', 13, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, ERR, KEY_DC, KEY_F(10)};
 static FunctionBar* Meters_movingBar = NULL;
 
-void MetersPanel_cleanup() {
+void MetersPanel_cleanup(void) {
    if (Meters_movingBar) {
       FunctionBar_delete(Meters_movingBar);
       Meters_movingBar = NULL;
@@ -91,7 +91,7 @@ static HandlerResult MetersPanel_eventHandler(Panel* super, int ch) {
    HandlerResult result = IGNORED;
    bool sideMove = false;
 
-   switch(ch) {
+   switch (ch) {
       case 0x0a:
       case 0x0d:
       case KEY_ENTER:
@@ -110,7 +110,8 @@ static HandlerResult MetersPanel_eventHandler(Panel* super, int ch) {
             break;
          Meter* meter = (Meter*) Vector_get(this->meters, selected);
          int mode = meter->mode + 1;
-         if (mode == LAST_METERMODE) mode = 1;
+         if (mode == LAST_METERMODE)
+            mode = 1;
          Meter_setMode(meter, mode);
          Panel_set(super, selected, (Object*) Meter_toListItem(meter, this->moving));
          result = HANDLED;
@@ -184,9 +185,9 @@ static HandlerResult MetersPanel_eventHandler(Panel* super, int ch) {
    if (result == HANDLED || sideMove) {
       Header* header = this->scr->header;
       this->settings->changed = true;
+      this->settings->lastUpdate++;
       Header_calculateHeight(header);
-      Header_draw(header);
-      ScreenManager_resize(this->scr, this->scr->x1, header->height, this->scr->x2, this->scr->y2);
+      ScreenManager_resize(this->scr);
    }
    return result;
 }
@@ -216,7 +217,7 @@ MetersPanel* MetersPanel_new(Settings* settings, const char* header, Vector* met
    this->leftNeighbor = NULL;
    Panel_setHeader(super, header);
    for (int i = 0; i < Vector_size(meters); i++) {
-      Meter* meter = (Meter*) Vector_get(meters, i);
+      const Meter* meter = (const Meter*) Vector_get(meters, i);
       Panel_add(super, (Object*) Meter_toListItem(meter, false));
    }
    return this;
